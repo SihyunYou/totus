@@ -1,0 +1,86 @@
+// 사용법.
+// 1. F12로 개발자 창을 켜주세요.
+// 2. 해당 스크립트를 전부 복사해서 붙여넣어주세요.
+// 3. 스크립트가 완료되면 개발자 콘솔에 나온 데이터를 복사해주세요.
+// 4. (3)에서 나온건 꼭 확인 필요합니다.
+
+// script 라는 id를 가진 div요소 내에서 번역문들의 박스를 관리하고 있음. 그 중에 content class를 가진 div 상위의 div가 scroll이 되는 box임.
+// scroll을 하기 위해서 scroll 되는 div를 찾는 라인.
+const contents = document.getElementsByClassName("scroll-area")[0];
+const wrapper = document.getElementById("script-scroll-area");
+
+// 전체 텍스트를 저장하는 문자열.
+const texts = [];
+
+// Loop를 돌면서 스크롤을 천천히 내림.
+// refer: https://stackoverflow.com/questions/5007530/how-do-i-scroll-to-an-element-using-javascript
+// refer:
+let scrollPosi = 0;
+
+// 스크롤 끝 탐지 함수
+function isScrollYEnd(ele) {
+  return Math.ceil(ele.scrollTop + ele.offsetHeight) >= ele.scrollHeight;
+}
+
+function writeToLocalFile(textContent, fileName) {
+  // 텍스트를 Blob으로 변환
+  const blob = new Blob([textContent], { type: "text/plain" });
+
+  // a 태그를 생성하여 Blob을 다운로드
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+
+  // DOM에 추가되지 않은 엘리먼트를 클릭하여 다운로드
+  a.click();
+
+  // 사용이 끝난 URL을 해제
+  URL.revokeObjectURL(a.href);
+}
+
+let my_text = "";
+// 0.25초 마다 100씩 내림
+const scrollingId = setInterval(() => {
+  // END ==>
+  if (isScrollYEnd(wrapper)) {
+    console.log("== 복사 완료 (아래 글을 복사해주세요.) ==");
+    console.log(texts);
+    //console.log(texts.map((el) => el.text).join("\n"));
+    clearInterval(scrollingId);
+
+    alert("복사 완료, 개발자 콘솔에 나온 텍스트를 복사해주세요. (!확인 필수)");
+    //writeToLocalFile(my_text, "C:\totus\before.txt")
+  }
+
+  scrollPosi += 50;
+  wrapper.scrollBy(0, scrollPosi); // x, y
+
+  const minHeight = Number(contents.style.minHeight.replace("px", ""));
+  console.log(`scroll: ${scrollPosi}, current: ${minHeight}`);
+
+  // Get Contents ==>
+  // 최신 content 를 가져옴.
+  const current = document.getElementsByClassName("scroll-area")[0];
+
+  // content class를 가진 div내의 각 box를 찾아 source에 한글만 긁어옴.
+  const convert = Array.from(current.childNodes);
+
+  for (let idx = 0; idx < convert.length; idx++) {
+    const time = convert[idx]
+      .querySelectorAll("[class*='ScriptArea__ScriptTimeWrapper']")[0]
+      .getElementsByTagName("p")[0]
+      .innerHTML.replace("<br>", "~");
+    const text =
+      convert[idx].getElementsByClassName("script-textarea")[0].textContent;
+
+    if (texts.filter((t) => t.timeId === time).length !== 0) {
+      continue;
+    }
+    console.log(`${time} && ${text}`);
+
+    texts.push({
+      timeId: time,
+      text: text,
+    });
+  }
+}, 350);
