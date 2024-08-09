@@ -21,7 +21,7 @@ GPT_API_KEY:str = ""
 
 # URL: 번역할 작업물이 있는 URL 주소
 URL:str = "https://totus.pro/ko" # Main Page
-TASK_URL:str = "https://main.totus.pro/ko/videoEditor?taskUuid=0a370d56-7274-40b0-99ae-21839f481fdb"
+TASK_URL:str = "https://main.totus.pro/ko/videoEditor?taskUuid=13fc6fc9-3085-4fbd-bda7-ea99566f48c4"
 
 # Options
 options = {
@@ -36,7 +36,7 @@ options = {
 chromeOptions = webdriver.ChromeOptions()
 chromeOptions.add_experimental_option("detach", True)
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),  options=chromeOptions)
+driver = webdriver.Chrome()
 driver.get(URL)
 time.sleep(options["driverLoadSpeed"])
 
@@ -121,3 +121,4 @@ while True:
     time.sleep(options['scrollSpeed'])
 
 print("완료되었습니다... 검토 후 임시저장을 해주세요.")
+time.sleep(9999999)
